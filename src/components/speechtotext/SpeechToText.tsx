@@ -13,20 +13,53 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { useToast } from "@/src/components/ui/use-toast";
+import { POST } from "@/app/api/talk/route";
+import { Button } from "@/components/ui/button";
 
 interface SpeechToTextProps{
+  refetch:()=>void;
   addToDo:(talk:ITalk) => void
 }
-function SpeechToText({addToDo}:SpeechToTextProps) {
-  const [transcript, setTranscript] = useState<string>('');
-  const [tag, setTag] = useState<string>('');
-  const [title, setTitle] = useState<string>('');
+
+const formSchema = z.object({
+  title:z.string().refine((val) => val.length >= 1, {
+    message: "Tem que ter no minimo 1 caracteres",
+  }),
+
+  tag:z.string().refine((val) => val.length >= 1, {
+    message: "Tem que ter no minimo 1 caracteres",
+  }),
+
+  text:z.string().refine((val) => val.length >= 1, {
+    message: "Tem que ter no minimo 1 caracteres",
+  }),
+
+})
+
+type FormData =z.infer<typeof formSchema>;
+
+
+function SpeechToText({addToDo,refetch}:SpeechToTextProps) {
+
+  const { toast } = useToast()
+
   
   const [recognition, setRecognition] = useState<any>(null); // Estado para armazenar o objeto de reconhecimento de fala
   const [status,setStatus] = useState<boolean>(false);
-   
+
+  const { handleSubmit,register,setValue,getValues,formState:{errors}} = useForm<FormData>({
+    mode:"onBlur",
+    resolver:zodResolver(formSchema)
+   })
+
+   const [open, setOpen] = useState(false);
   const handleSpeechRecognition = () => {
-      setTranscript('')
+
       setStatus(true)
     if ('webkitSpeechRecognition' in window) {
        //@ts-ignore
@@ -36,7 +69,9 @@ function SpeechToText({addToDo}:SpeechToTextProps) {
       
       recognition.onresult = (event: any) => {
         const result = event.results[event.results.length - 1];
-        setTranscript((item) => item + result[0].transcript);
+      
+        const textOld = getValues("text")
+        setValue("text", result[0].transcript ? textOld + ' ' + result[0].transcript:'',{ shouldValidate: true });
       };
       recognition.start();
       setRecognition(recognition); // Armazena o objeto de reconhecimento de fala no estado
@@ -53,17 +88,62 @@ function SpeechToText({addToDo}:SpeechToTextProps) {
   };
 
 
-  const handleSave =()=>{
-    stopSpeechRecognition()
-    addToDo({tag,title,text:transcript})
-    setTag('')
-    setTitle('')
-    setTranscript('')
-
+  
+  const handleClearTrascript = () =>{
+    setValue("text", '',{ shouldValidate: true });
   }
+
+
+
+   const mutation = useMutation({
+    mutationFn: async (data:FormData) => {
+      let dataResponse = data;
+     
+    
+      return     POST(dataResponse)
+      .then(response => response)
+    },
+    onError:(error) => {
+      toast({
+        title: error.message,
+       
+      })
+      console.log( error.message)
+    },
+    onSuccess:(data) =>{
+
+      if(data.error){
+             toast({
+                 variant: "destructive" ,
+                title: data.error,
+              })
+              console.log(data.error)
+      }else{
+           toast({
+          
+             title: "Processo cadastrado com sucesso",
+           })
+          
+           stopSpeechRecognition()
+         // addToDo({tag,title,text:transcript})
+         setValue("title", '',{ shouldValidate: true });
+         setValue("tag", '',{ shouldValidate: true });
+         setValue("text", '',{ shouldValidate: true });
+          setOpen(false);
+          refetch();
+           
+      }
+    
+    }
+   })
+   const onSubmit = async (data:FormData) => {
+
+ 
+   mutation.mutate(data)
+ }
   return (  
     <>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger  className="bg-red-500 shadow-lg shadow-red-500/50  p-2 ms-3 rounded hover:animate-pulse"> <Mic /> </DialogTrigger>
             <DialogContent >
                 <DialogHeader>
@@ -87,25 +167,34 @@ function SpeechToText({addToDo}:SpeechToTextProps) {
                 </DialogHeader>
                 <Card className={`flex flex-wrap justify-center items-center `}>
                     <CardContent className="flex-1">
+                    <form onSubmit={handleSubmit(onSubmit)} >
                     <div>
-                        <Input id="tag" name="tag" placeholder="Digite a tag" className="mb-3 mt-5 border-none"
-                           onChange={(e) => setTag(e.target.value)}
-                           value={tag}
+                        <Input id="tag" {...register('tag')} placeholder="Digite a tag" className="mb-3 mt-5 border-none"
+                          //  onChange={(e) => setTag(e.target.value)}
+                          //  value={tag}
                         />
-                        <Input id="title" name="title" placeholder="Digite o Titulo" className="mb-3 mt-5 border-none"
-                         onChange={(e) => setTitle(e.target.value)}
-                         value={title}
+                        {errors.tag?.message && <p className="text-sm text-red-400">{errors.tag?.message}</p> }
+                      
+                        <Input id="title" {...register('title')} placeholder="Digite o Titulo" className="mb-3 mt-5 border-none"
+                        //  onChange={(e) => setTitle(e.target.value)}
+                        //  value={title}
                         />
-                        <Textarea id="title" name="title" placeholder="Digite o Titulo" className="mb-3 mt-5 " 
-                        onChange={(e) => setTranscript(e.target.value) } 
-                        value={transcript}/>
+                        {errors.title?.message && <p className="text-sm text-red-400">{errors.title?.message}</p> }
+                      
+                        <Textarea id="text" {...register('text')} placeholder="Trascreva" className="mb-3 mt-5 " 
+                        //  onChange={(e) => setTranscript(e.target.value) } 
+                        //  value={transcript}
+                        />
+                        {errors.text?.message && <p className="text-sm text-red-400">{errors.text?.message}</p> }
                    </div>
                    <div className="flex justify-end items-end mt-4 gap-3">
-                   <DialogClose asChild>
-                    <Save onClick={handleSave}/>
-                    </DialogClose>
-                    <Eraser onClick={()=>setTranscript('')} />
+                
+                    <Button size="icon" variant="outline" ><Save /></Button> 
+                     <div className="p-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                    <Eraser onClick={handleClearTrascript} className="border" />
+                    </div>
                    </div>
+                   </form>
                     </CardContent>
                 </Card>
             </DialogContent>

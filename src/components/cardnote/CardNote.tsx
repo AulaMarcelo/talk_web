@@ -1,12 +1,17 @@
+"use client"
 import { Mail, Save, Tag, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
+
+
+
 
 interface CardNoteProps{
   
     talk:ITalk
 }
 function CardNote({talk}:CardNoteProps) {
+  
     return (
         <>
          <Card className="flex-1 mb-4 w-[300px] md:w-1/2 ">
