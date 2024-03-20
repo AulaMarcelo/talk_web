@@ -17,7 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { useToast } from "@/src/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { POST } from "@/app/api/talk/route";
 import { Button } from "@/components/ui/button";
 

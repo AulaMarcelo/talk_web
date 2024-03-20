@@ -19,7 +19,7 @@ import SpeechToText from "../speechtotext/SpeechToText";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GET } from "@/app/api/talk/route";
 
-import { useToast } from "@/src/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 
 

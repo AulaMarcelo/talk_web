@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
-import { Toaster } from "@/src/components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
+import Header from "@/components/header/Header";
+import SessionWrapper from "@/providers/SessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +19,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <SessionWrapper>
     <html lang="en">
       <body className={inter.className}>
         <QueryProvider>
-        {children}
-        <Toaster />
+   
+            <Header/>
+            {children}
+            <Toaster />
+       
         </QueryProvider>
       </body>
     </html>
+    </SessionWrapper>
   );
 }
