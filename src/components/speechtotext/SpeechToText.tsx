@@ -23,7 +23,8 @@ import { Button } from "@/components/ui/button";
 
 interface SpeechToTextProps{
   refetch:()=>void;
-  addToDo:(talk:ITalk) => void
+  addToDo:(talk:ITalk) => void;
+  email:string;
 }
 
 const formSchema = z.object({
@@ -39,12 +40,14 @@ const formSchema = z.object({
     message: "Tem que ter no minimo 1 caracteres",
   }),
 
+  email:z.string().optional()
+
 })
 
 type FormData =z.infer<typeof formSchema>;
 
 
-function SpeechToText({addToDo,refetch}:SpeechToTextProps) {
+function SpeechToText({addToDo,refetch,email}:SpeechToTextProps) {
 
   const { toast } = useToast()
 
@@ -97,9 +100,12 @@ function SpeechToText({addToDo,refetch}:SpeechToTextProps) {
 
    const mutation = useMutation({
     mutationFn: async (data:FormData) => {
-      let dataResponse = data;
+      let dataResponse = {
+        ...data,
+        email:email
+      };
      
-    
+      
       return     POST(dataResponse)
       .then(response => response)
     },

@@ -5,11 +5,11 @@ import { ReactNode } from "react";
 import { SessionProvider as NextProvider } from "next-auth/react"
 
 
-interface QueryProviderProps{
+interface SessionProviderProps{
     children:ReactNode
     
 }
-function SessionWrapper ({children}:QueryProviderProps) {
+function SessionWrapper ({children}:SessionProviderProps) {
     return (  
         <NextProvider>
         {children}

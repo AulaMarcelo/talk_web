@@ -5,25 +5,21 @@ import { Input } from "../ui/input";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import CardNote from "../cardnote/CardNote";
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "@/components/ui/dialog"
+
 import { useState } from "react";
-import { Textarea } from "../ui/textarea";
+
 import SpeechToText from "../speechtotext/SpeechToText";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { GET } from "@/app/api/talk/route";
 
 import { useToast } from "@/components/ui/use-toast";
+import { IUserAuth } from "@/interface/user/interface";
 
 
-
-function Talk() {
+interface TalkProps{
+    userAuth: IUserAuth
+}
+function Talk({userAuth}:TalkProps) {
 
     const [skip,setSkipped] = useState(0)
     const [filter,setFilter] = useState('')
@@ -39,9 +35,12 @@ function Talk() {
 
     const {data,isPending,isError,error,refetch} = useQuery({
         queryKey:['notes',skip,search],
-        queryFn:() => GET(skip,search),
+        queryFn:() => GET(userAuth.email!,skip,search),
       })
 
+    const handleSearch = () =>{
+        setSearch(filter);
+    }
     
     if(isError){
         toast({
@@ -59,11 +58,11 @@ function Talk() {
         <div className="flex flex-col">
         <div className="flex items-center justify-center w-full">
             <div className="flex border md:w-1/2">
-                <Input id="search" name="search" className="border-none focus-visible:outline-none"  />
-                <Button size="icon" variant="outline" className="border-none" ><Search /></Button>
+                <Input id="search" name="search" className="border-none focus-visible:outline-none" value={filter} onChange={(e) => setFilter(e.target.value)} />
+                <Button size="icon" variant="outline" className="border-none" onClick={handleSearch} ><Search /></Button>
             </div>
     
-            <SpeechToText addToDo={addTodo} refetch={refetch}/>
+            <SpeechToText addToDo={addTodo} refetch={refetch} email={userAuth.email!}/>
                
            
         </div>
@@ -71,7 +70,7 @@ function Talk() {
         <div className="flex flex-col p-3 justify-center items-center mt-5">
 
             {data.map((talk:ITalk)=>(
-                <CardNote key={talk.id} talk={talk}  />
+                <CardNote key={talk.id} talk={talk} refetch={refetch}  />
             ))}
              <div className="
                 fixed bottom-4 right-4  bg-gray-900   rounded-full p-3 shadow-lg 

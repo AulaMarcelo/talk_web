@@ -1,7 +1,7 @@
 import { baseUrl, takeBase } from "@/config/confit";
 
-const GetNotes = async  (skip:number,filter:string) => {
-    const url = `${baseUrl}/note/getall?take=${takeBase}&skip=${skip}&filter=${filter}`;	
+const GetNotes = async  (email:string,skip:number,filter:string) => {
+    const url = `${baseUrl}/note/getall?email=${email}&take=${takeBase}&skip=${skip}&filter=${filter}`;	
     const response = await fetch(url)
 
     if(!response.ok){
@@ -30,5 +30,22 @@ const PostNotes = async  (data:ITalk) => {
  
     return note ;
 }
+
+const DeleteNotes = async  (id:string) => {
+    const url = `${baseUrl}/note/delete/${id}`;
+    const response = await fetch(url,{
+        method: 'DELETE',
+        headers: {
+            'Content-type': 'application/json',
+        }
+    })
+
+    if (!response.ok) {
+       throw new Error("Conexão com a rede está com problema")
+    }
+    const note = await response.json() 
  
-export  {GetNotes as GET,PostNotes as POST};
+    return note ;
+}
+ 
+export  {GetNotes as GET,PostNotes as POST,DeleteNotes as DELETE};
