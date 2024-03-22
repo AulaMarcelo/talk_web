@@ -54,6 +54,7 @@ function SpeechToText({addToDo,refetch,email}:SpeechToTextProps) {
   
   const [recognition, setRecognition] = useState<any>(null); // Estado para armazenar o objeto de reconhecimento de fala
   const [status,setStatus] = useState<boolean>(false);
+  const [loading,setLoading] = useState<boolean>(false);
 
   const { handleSubmit,register,setValue,getValues,formState:{errors}} = useForm<FormData>({
     mode:"onBlur",
@@ -135,6 +136,7 @@ function SpeechToText({addToDo,refetch,email}:SpeechToTextProps) {
          setValue("title", '',{ shouldValidate: true });
          setValue("tag", '',{ shouldValidate: true });
          setValue("text", '',{ shouldValidate: true });
+         setLoading(false)
           setOpen(false);
           refetch();
            
@@ -144,7 +146,7 @@ function SpeechToText({addToDo,refetch,email}:SpeechToTextProps) {
    })
    const onSubmit = async (data:FormData) => {
 
- 
+   setLoading(true)
    mutation.mutate(data)
  }
   return (  
@@ -195,7 +197,7 @@ function SpeechToText({addToDo,refetch,email}:SpeechToTextProps) {
                    </div>
                    <div className="flex justify-end items-end mt-4 gap-3">
                 
-                    <Button size="icon" variant="outline" ><Save /></Button> 
+                    <Button size="icon" variant="outline" disabled={loading} ><Save /></Button> 
                      <div className="p-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
                     <Eraser onClick={handleClearTrascript} className="border" />
                     </div>

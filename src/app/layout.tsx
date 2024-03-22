@@ -5,9 +5,8 @@ import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/header/Header";
 import SessionWrapper from "@/providers/SessionProvider";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 
+import { GoogleAnalytics } from '@next/third-parties/google'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -37,6 +36,7 @@ export default async function RootLayout({
        
         </QueryProvider>
       </body>
+      <GoogleAnalytics gaId="GTM-5FTF2ZHC" />
     </html>
     </SessionWrapper>
   );
