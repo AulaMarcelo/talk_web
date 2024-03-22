@@ -5,3 +5,8 @@ export interface IUserAuth{
         image?:  string | null | undefined
    
 }
+
+export interface IUpdatePrompt{
+        email:string,
+        prompt:string
+}

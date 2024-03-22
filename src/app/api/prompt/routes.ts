@@ -1,20 +1,9 @@
 import { baseUrl, takeBase } from "@/config/confit";
+import { IUpdatePrompt } from "@/interface/user/interface";
 
-const GetNotes = async  (email:string,skip:number,filter:string) => {
-    const url = `${baseUrl}/note/getall?email=${email}&take=${takeBase}&skip=${skip}&filter=${filter}`;	
-    const response = await fetch(url)
 
-    if(!response.ok){
-        throw new Error("Erro com a conexção")
-    }
-    
-    const notes = await response.json();
-    console.log("Notes",notes)
-    return notes;
-}
-
-const PostNotes = async  (data:ITalk) => {
-    const url = `${baseUrl}/note`;
+const UpdatePrompt = async  (data:IUpdatePrompt) => {
+    const url = `${baseUrl}/note/promptupdate`;
     const response = await fetch(url,{
         method: 'POST',
         headers: {
@@ -33,13 +22,14 @@ const PostNotes = async  (data:ITalk) => {
 
 
 
-const DeleteNotes = async  (id:string) => {
-    const url = `${baseUrl}/note/delete/${id}`;
+const GetPrompt = async  (email:string) => {
+    const url = `${baseUrl}/note/promptget?email=${email}`;
     const response = await fetch(url,{
-        method: 'DELETE',
+        method: 'GET',
         headers: {
             'Content-type': 'application/json',
-        }
+        },
+       
     })
 
     if (!response.ok) {
@@ -49,5 +39,7 @@ const DeleteNotes = async  (id:string) => {
  
     return note ;
 }
+
+
  
-export  {GetNotes as GET,PostNotes as POST,DeleteNotes as DELETE};
+export  {UpdatePrompt as POST,GetPrompt as GET};

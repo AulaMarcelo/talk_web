@@ -56,18 +56,21 @@ function Talk({userAuth}:TalkProps) {
     }
     return (  
         <div className="flex flex-col">
+             <div className="text-center mb-3">
+              <p className="text-xs text-yellow-100">Para configurar a IA clique no icone no cabeçalho</p>
+            </div>
         <div className="flex items-center justify-center w-full">
             <div className="flex border md:w-1/2">
                 <Input id="search" name="search" className="border-none focus-visible:outline-none" value={filter} onChange={(e) => setFilter(e.target.value)} />
                 <Button size="icon" variant="outline" className="border-none" onClick={handleSearch} ><Search /></Button>
             </div>
-    
+          
             <SpeechToText addToDo={addTodo} refetch={refetch} email={userAuth.email!}/>
                
            
         </div>
-
-        <div className="flex flex-col p-3 justify-center items-center mt-5">
+           
+        <div className="flex flex-col p-3 justify-center items-center mt-4">
 
             {data.map((talk:ITalk)=>(
                 <CardNote key={talk.id} talk={talk} refetch={refetch}  />
