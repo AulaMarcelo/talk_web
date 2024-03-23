@@ -29,8 +29,8 @@ export default async function RootLayout({
     <SessionWrapper>
     <html lang="en">
       <head>
-          <Script async src="https://www.googletagmanager.com/gtag/js?id=G-6TH6ZR8K9F"></Script>
-          <Script>
+          <Script id="analytics" async src="https://www.googletagmanager.com/gtag/js?id=G-6TH6ZR8K9F"></Script>
+          <Script id="anaytlicsdatalayoer">
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
